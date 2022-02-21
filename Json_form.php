@@ -9,7 +9,7 @@
 <body>
 <div class="container mx-auto mt-5">
 <div class="col-12 col-lg-5 mx-auto">
-<form method="post" action="">
+<form method="post" action="" name="jsonform"  onsubmit="return validateForm()">
 <?php
 $data = ($_POST['jsondt']);
 $data = json_decode($data);
@@ -24,9 +24,17 @@ foreach($data->fields as $field){
 		   <option value="<?=$item->value?>"><?=$item->text?></option>
 	    <?php } ?>
 	</select>
-	<label><?=$field->label?></label>
+	<label><?=$field->label?><?= $field->unit ? "(".$field->unit.")":" " ?></label>
 	</div>
- 	<?php }else{?>
+ 	<!--  -->
+ 	<?php }if($field->type=="textarea"){?>
+    <div class="form-floating mb-3 mt-3">
+	<textarea name="<?=$field->key?>"  class="form-control" <?=$field->isRequired? "required" : " "?> <?=$field->isReadonly ? "readonly" : " "?> placeholder="<?=$field->label?>">
+	</textarea>
+	<label><?=$field->label?><?= $field->unit ? "(".$field->unit.")":" " ?></label>
+	</div>
+ 	<!--  -->
+ 	<?php }if($field->type=="text" || $field->type=="checkbox" || $field->type=="date"|| $field->type==" date" || $field->type=="email" || $field->type=="file" || $field->type=="radio" || $field->type=="number"){?>
 	<div class="form-floating mb-3 mt-3">
 	<input type="<?=$field->type?>"  class="form-control" placeholder="<?=$field->label?>" name="<?=$field->key?>" <?=$field->isRequired? "required" : " "?> <?=$field->isReadonly ? "readonly" : " "?> >
 	<label><?=$field->label?><?= $field->unit ? "(".$field->unit.")":" " ?></label>
@@ -35,5 +43,18 @@ foreach($data->fields as $field){
 <input type="submit" name="submit" class="btn btn-primary btn-block" value="Submit">
 </form>
 </div>
+<script>
+            function validateForm() {
+            	<?php foreach($data->fields as $field){?>
+                var <?=$field->key?> = document.forms["jsonform"]["<?=$field->key?>"];
+                if (<?=$field->key?>.value == "") {
+                    window.alert("Please enter <?=$field->label?>");
+                    <?=$field->key?>.focus();
+                    return false;
+                }
+             <?php }?>
+                 return true;
+              }
+  </script>
 </body>
 </html>
